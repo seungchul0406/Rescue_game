@@ -23,24 +23,23 @@ def drawGoal(goalPos):
 	pygame.draw.rect(screen, config.GREEN, goal)
 # =========================================================================
 #Update the agent position
-def updateAgent(action, agentPos, dft):
+def updateAgent(action, agentPos):
 	# Assume Action is scalar:  0:stay, 1:Up, 2:Down 3:Left 4:Right
-	dft =7
 	agentXPos = agentPos[0]
 	agentYPos = agentPos[1]
 	
 	#if move up
 	if (action == 1):
-		agentYPos = agentPos[1] + config.AGENT_SPEED*dft	
+		agentYPos = agentPos[1] + config.AGENT_SPEED	
 	#if move down
 	if (action == 2):
-		agentYPos = agentPos[1] - config.AGENT_SPEED*dft
+		agentYPos = agentPos[1] - config.AGENT_SPEED
 	#if move right
 	if (action == 3):
-		agentXPos = agentPos[0] + config.AGENT_SPEED*dft
+		agentXPos = agentPos[0] + config.AGENT_SPEED
 	#if move left
 	if (action == 4):
-		agentXPos = agentPos[0] - config.AGENT_SPEED*dft
+		agentXPos = agentPos[0] - config.AGENT_SPEED
 
 	#don't let it move off the screen
 	if (agentPos[0] < 0 + config.AGENT_SIZE):
@@ -56,8 +55,7 @@ def updateAgent(action, agentPos, dft):
 	return agentPos
 # =========================================================================
 #Update the person position, using the agent posistions
-def updatePerson(agentPos, obstaclePos, personPos, dft):
-	dft =7
+def updatePerson(agentPos, obstaclePos, personPos):
 	personXPos = personPos[0]
 	personYPos = personPos[1]
 	
@@ -65,39 +63,39 @@ def updatePerson(agentPos, obstaclePos, personPos, dft):
 	if abs(agentPos[0] - personPos[0]) < 50 and abs(agentPos[1] - personPos[1]) < 50:
 
 		if agentPos[0] > personPos[0]:
-			personXPos = personPos[0] - config.PERSON_SPEED*dft
+			personXPos = personPos[0] - config.PERSON_SPEED
 		elif agentPos[0] < personPos[0]:
-			personXPos = personPos[0] + config.PERSON_SPEED*dft
+			personXPos = personPos[0] + config.PERSON_SPEED
 
 		if agentPos[1] > personPos[1]:
-			personYPos = personPos[1] - config.PERSON_SPEED*dft
+			personYPos = personPos[1] - config.PERSON_SPEED
 		elif agentPos[1] < personPos[1]:
-			personYPos = personPos[1] + config.PERSON_SPEED*dft
+			personYPos = personPos[1] + config.PERSON_SPEED
 
 	# move around obstacle nearby
 	if abs(obstaclePos[0] - personPos[0]) < config.OBSTACLE_WIDTH * 0.5 and abs(obstaclePos[1] - personPos[1]) < config.GOAL_HEIGHT * 0.5:
 
 		if obstaclePos[0] > personPos[0]:
-			personXPos = personPos[0] - config.PERSON_SPEED*dft
+			personXPos = personPos[0] - config.PERSON_SPEED
 		elif obstaclePos[0] < personPos[0]:
-			personXPos = personPos[0] + config.PERSON_SPEED*dft
+			personXPos = personPos[0] + config.PERSON_SPEED
 
 		if obstaclePos[1] > personPos[1]:
-			personYPos = personPos[1] - config.PERSON_SPEED*dft
+			personYPos = personPos[1] - config.PERSON_SPEED
 		elif obstaclePos[1] < personPos[1]:
-			personYPos = personPos[1] + config.PERSON_SPEED*dft
+			personYPos = personPos[1] + config.PERSON_SPEED
 
 	# move around whenever there isn't the agent nearby
 	else:
 		choice = random.randint(1, 5)
 		if choice == 1:
-			personXPos = personPos[0] + int(random.randint(1, 5) * 1.0)
+			personXPos = personPos[0] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
 		elif choice == 2:
-			personYPos = personPos[1] + int(random.randint(1, 5) * 1.0)
+			personYPos = personPos[1] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
 		elif choice == 3:
-			personXPos = personPos[0] - int(random.randint(1, 5) * 1.0)
+			personXPos = personPos[0] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
 		elif choice == 4:
-			personYPos = personPos[1] - int(random.randint(1, 5) * 1.0)
+			personYPos = personPos[1] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
 		elif choice == 5:
 			pass
 	
@@ -113,7 +111,7 @@ def updatePerson(agentPos, obstaclePos, personPos, dft):
 
 	personPos = (personXPos, personYPos)
 	return personPos
-# =========================================================================812NZSJ037550
+# =========================================================================
 #Game class
 class Rescue:
 	def __init__(self):
@@ -159,27 +157,45 @@ class Rescue:
 		drawPerson(self.personPos)
 		drawObstacle(self.obstaclePos)
 		drawGoal(self.goalPos)
+		self.distance_prev_person_goal = self.distance(self.personPos,self.goalPos)
+		self.distance_prev_agent_person = self.distance(self.agentPos,self.personPos)
 		#updates the window
 		pygame.display.flip()
-		self.distance_prev = self.distance()
-		self.distance_2_prev = self.distance_2()
+		
 
-	#  distance between goal and person
-	def distance(self):
-		distance = ((self.goalPos[0]-self.personPos[0])**2 + (self.goalPos[1]-self.personPos[1])**2)**0.5
-		# print("distance : ",distance)
+	#  distance between two dots
+	def distance(self,dot1,dot2):
+		distance = ((dot1[0]-dot2[0])**2 + (dot1[1]-dot2[1])**2)**0.5
 		return distance
 
-	#  distance between person and agent
-	def distance_2(self):
-		distance_2 = ((self.personPos[0]-self.agentPos[0])**2 + (self.personPos[1]-self.agentPos[1])**2)**0.5
-		# print("distance : ",distance)
-		return distance_2
-	
-	#  Reset condition check
-	def Condition(self):
+    #  Game Update Inlcuding Display
+	def PlayNextMove(self, action):
 		score_1 = 0
 		score_2 = 0
+	
+		pygame.event.pump()
+		screen.fill(config.BLACK)
+
+		#draw goal & obstacle
+		drawObstacle(self.obstaclePos)
+		self.obstacleXPos = self.obstaclePos[0]
+		self.obstacleYPos = self.obstaclePos[1]
+		drawGoal(self.goalPos)
+		self.goalXPos = self.goalPos[0]
+		self.goalYPos = self.goalPos[1]
+
+		#update agent
+		self.agentPos = updateAgent(action, self.agentPos)
+		drawAgent(self.agentPos)
+		self.agentXPos = self.agentPos[0]
+		self.agentYPos = self.agentPos[1]
+		
+		#update person
+		self.personPos = updatePerson(self.agentPos, self.obstaclePos, self.personPos)
+		drawPerson(self.personPos)
+		self.personXPos = self.personPos[0]
+		self.personYPos = self.personPos[1]
+
 		#goal arrived
 		if abs(self.goalPos[0] - self.personPos[0]) < config.GOAL_WIDTH and abs(self.goalPos[1] - self.personPos[1]) < config.GOAL_HEIGHT:
 			condition = "success"
@@ -192,47 +208,19 @@ class Rescue:
 		#score based on distance
 		else :
 			condition = "none"
-			if self.distance() < self.distance_prev:
-				score_1 = 0.1
-			elif self.distance() > self.distance_prev:
-				score_1 = - 0.1
-			if self.distance_2() < self.distance_2_prev:
-				score_2 = 0.01
-			elif self.distance_2() > self.distance_2_prev:
+			if self.distance(self.personPos,self.goalPos) < self.distance_prev_person_goal:
+				score_1 = 5.
+			elif self.distance(self.personPos,self.goalPos) > self.distance_prev_person_goal:
+				score_1 = - 0.5
+			if self.distance(self.agentPos,self.personPos) < self.distance_prev_agent_person:
+				score_2 = 0.05
+			elif self.distance(self.agentPos,self.personPos) > self.distance_prev_agent_person:
 				score_2 = - 0.01
-			# score_3 = - self.GTimeDisplay * 0.0001
-			self.score = score_1 + score_2
-			# print(score_1,score_2)
 			
-			self.distance_prev = self.distance()
-			self.distance_2_prev = self.distance_2()
-		
-		return condition, self.score
-
-
-    #  Game Update Inlcuding Display
-	def PlayNextMove(self, action):
-		# Calculate DeltaFrameTime
-		DeltaFrameTime = self.clock.tick(config.FPS)
-	
-		pygame.event.pump()
-		screen.fill(config.BLACK)
-
-		#draw goal & obstacle
-		drawObstacle(self.obstaclePos)
-		drawGoal(self.goalPos)
-
-		#update agent
-		self.agentPos = updateAgent(action, self.agentPos, DeltaFrameTime)
-		drawAgent(self.agentPos)
-		self.agentXPos = self.agentPos[0]
-		self.agentYPos = self.agentPos[1]
-		
-		#update person
-		self.personPos = updatePerson(self.agentPos, self.obstaclePos, self.personPos, DeltaFrameTime)
-		drawPerson(self.personPos)
-		self.personXPos = self.personPos[0]
-		self.personYPos = self.personPos[1]
+			self.score = score_1 + score_2
+			
+			self.distance_prev_person_goal = self.distance(self.personPos,self.goalPos)
+			self.distance_prev_agent_person = self.distance(self.agentPos,self.personPos)
 
 		#  Display Parameters
 		ScoreDisplay = self.font.render("Score: "+ str("{0:.2f}".format(self.score)), True,(255,255,255))
@@ -250,7 +238,7 @@ class Rescue:
 		pygame.display.flip()
 
 		#return the score and position of the agent and person 
-		return [self.score,self.agentXPos, self.agentYPos, self.personXPos, self.personYPos]
+		return [condition, self.score,self.agentXPos, self.agentYPos, self.personXPos, self.personYPos, self.obstacleXPos, self.obstacleYPos, self.goalXPos, self.goalYPos]
 		
 	def UpdateGameDisplay(self, Episode, Epsilon, Success, GTime):
 		self.EpisodeDisplay = Episode

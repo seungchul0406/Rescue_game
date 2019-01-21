@@ -62,25 +62,23 @@ class Agent:
 
 		self.brain = Brain(NbrStates, NbrActions)
 		self.ExpReplay = ExpReplay(config.ExpReplay_CAPACITY)
-		self.steps = 0
 		self.epsilon = config.MAX_EPSILON
         
 	# ============================================
 	# Return the Best Action  from a Q[S,A] search.  Depending upon an Epslion Explore/ Exploitaiton decay ratio 
-	def Act(self, s):
-		if (random.random() < self.epsilon or self.steps < config.OBSERVEPERIOD):
+	def Act(self, s, Episode):
+		if (random.random() < self.epsilon or Episode < config.OBSERVEPERIOD):
 			return random.randint(0, self.NbrActions-1)						# Explore 
 		else:
 			return numpy.argmax(self.brain.predictOne(s))					# Exploit Brain best Prediction 
 
 	# ============================================
-	def CaptureSample(self, sample):  # in (s, a, r, s_) format
+	def CaptureSample(self, sample, Episode):  # in (s, a, r, s_) format
 		self.ExpReplay.add(sample)        
 
 		# slowly decrease Epsilon based on our eperience
-		self.steps += 1
-		if(self.steps>config.OBSERVEPERIOD):
-			self.epsilon = config.MIN_EPSILON + (config.MAX_EPSILON - config.MIN_EPSILON) * math.exp(-config.LAMBDA * (self.steps-config.OBSERVEPERIOD))
+		if(Episode>config.OBSERVEPERIOD):
+			self.epsilon = config.MIN_EPSILON + (config.MAX_EPSILON - config.MIN_EPSILON) * math.exp(-config.LAMBDA * (Episode-config.OBSERVEPERIOD))
 
 	# ============================================
 	# Perform an Agent Training Cycle Update by processing a set of sampels from the Experience Replay memory 
