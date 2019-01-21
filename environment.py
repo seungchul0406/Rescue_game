@@ -73,7 +73,7 @@ def updatePerson(agentPos, obstaclePos, personPos):
 			personYPos = personPos[1] + config.PERSON_SPEED
 
 	# move around obstacle nearby
-	if abs(obstaclePos[0] - personPos[0]) < config.OBSTACLE_WIDTH * 0.5 and abs(obstaclePos[1] - personPos[1]) < config.GOAL_HEIGHT * 0.5:
+	if abs(obstaclePos[0] - personPos[0]) < config.OBSTACLE_WIDTH  * 0.5 - config.PERSON_SIZE and abs(obstaclePos[1] - personPos[1]) < config.GOAL_HEIGHT * 0.5 - config.PERSON_SIZE:
 
 		if obstaclePos[0] > personPos[0]:
 			personXPos = personPos[0] - config.PERSON_SPEED
@@ -86,18 +86,18 @@ def updatePerson(agentPos, obstaclePos, personPos):
 			personYPos = personPos[1] + config.PERSON_SPEED
 
 	# move around whenever there isn't the agent nearby
-	else:
-		choice = random.randint(1, 5)
-		if choice == 1:
-			personXPos = personPos[0] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
-		elif choice == 2:
-			personYPos = personPos[1] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
-		elif choice == 3:
-			personXPos = personPos[0] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
-		elif choice == 4:
-			personYPos = personPos[1] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
-		elif choice == 5:
-			pass
+	# else:
+	# 	choice = random.randint(1, 5)
+	# 	if choice == 1:
+	# 		personXPos = personPos[0] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
+	# 	elif choice == 2:
+	# 		personYPos = personPos[1] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
+	# 	elif choice == 3:
+	# 		personXPos = personPos[0] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
+	# 	elif choice == 4:
+	# 		personYPos = personPos[1] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
+	# 	elif choice == 5:
+	# 		pass
 	
 	#don't let it move off the screen
 	if (personPos[0] < 0 + config.PERSON_SIZE*4):
@@ -197,11 +197,11 @@ class Rescue:
 		self.personYPos = self.personPos[1]
 
 		#goal arrived
-		if abs(self.goalPos[0] - self.personPos[0]) < config.GOAL_WIDTH and abs(self.goalPos[1] - self.personPos[1]) < config.GOAL_HEIGHT:
+		if abs(self.goalPos[0] - self.personPos[0]) < config.GOAL_WIDTH * 0.5 and abs(self.goalPos[1] - self.personPos[1]) < config.GOAL_HEIGHT * 0.5:
 			condition = "success"
 			self.score = 50.
 		#obstacle collision
-		elif abs(self.obstaclePos[0] - self.agentPos[0]) < config.OBSTACLE_WIDTH and abs(self.obstaclePos[1] - self.agentPos[1]) < config.OBSTACLE_HEIGHT:
+		elif abs(self.obstaclePos[0] - self.agentPos[0]) < config.OBSTACLE_WIDTH * 0.5 - config.AGENT_SIZE and abs(self.obstaclePos[1] - self.agentPos[1]) < config.OBSTACLE_HEIGHT * 0.5 - config.AGENT_SIZE:
 			condition = "fail"
 			self.score = - 5.
 
@@ -227,7 +227,7 @@ class Rescue:
 		screen.blit(ScoreDisplay,(400.,20.))
 		EpisodeDisplay = self.font.render("Episode: "+ str(self.EpisodeDisplay), True,(255,255,255))
 		screen.blit(EpisodeDisplay,(400.,40.))
-		EpsilonDisplay = self.font.render("Ep: "+ str("{0:.2f}".format(self.GEpsilonDisplay)), True,(255,255,255))
+		EpsilonDisplay = self.font.render("Epsilon: "+ str("{0:.2f}".format(self.GEpsilonDisplay)), True,(255,255,255))
 		screen.blit(EpsilonDisplay,(400.,60.))
 		SuccessDisplay = self.font.render("Success: "+ str(self.SuccessDisplay), True,(255,255,255))
 		screen.blit(SuccessDisplay,(400.,80.))

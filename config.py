@@ -6,8 +6,8 @@ OBSTACLE_NUM = 2
 #Size parameter
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
-AGENT_SIZE = 10
-PERSON_SIZE = 10
+AGENT_SIZE = 6
+PERSON_SIZE = 6
 OBSTACLE_WIDTH = 50
 OBSTACLE_HEIGHT = 20
 GOAL_WIDTH = 50
@@ -36,7 +36,7 @@ GOAL_POS = (450,450)
 #   DQN Algorith Paramaters 
 ACTIONS = 5 # Number of Actions.  Acton istelf is a scalar:  0:stay, 1:Up, 2:Down 3:Right 4.Left
 STATECOUNT = 8 # Size of State [agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos] 
-MAX_EPISODE = 5000
+MAX_EPISODE = 100
 MAX_GAMETIME = 300
 
 #   DQN Algorith Hyper Paramaters 
@@ -46,4 +46,4 @@ BATCH_SIZE = 128
 GAMMA = 0.95				# Q Reward Discount Gamma
 MAX_EPSILON = 1
 MIN_EPSILON = 0.05
-LAMBDA = 0.1      		# Speed of Epsilon decay
+LAMBDA = 0.05      		# Speed of Epsilon decay
