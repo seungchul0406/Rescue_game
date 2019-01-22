@@ -35,9 +35,9 @@ GOAL_POS = (450,450)
 
 #   DQN Algorith Paramaters 
 ACTIONS = 5 # Number of Actions.  Acton istelf is a scalar:  0:stay, 1:Up, 2:Down 3:Right 4.Left
-STATECOUNT = 8 # Size of State [agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos] 
+STATECOUNT = AGENT_NUM * 2 + PERSON_NUM * 2 + OBSTACLE_NUM * 2 + 2 #Size of State [agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos] 
 MAX_EPISODE = 100
-MAX_GAMETIME = 300
+MAX_GAMETIME = 300000
 
 #   DQN Algorith Hyper Paramaters 
 ExpReplay_CAPACITY = 2000

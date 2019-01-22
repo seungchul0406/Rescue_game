@@ -6,16 +6,21 @@ import random
 import matplotlib.pyplot as plt
 # =======================================================================
 # Normalise GameState
-def CaptureNormalisedState(agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos):
-	gstate = np.zeros([config.STATECOUNT])
-	gstate[0] = agentXPos/500.0	# Normalised agentXPos
-	gstate[1] = agentYPos/500.0	# Normalised agentYPos
-	gstate[2] = personXPos/500.0 # Normalised personXPos
-	gstate[3] = personYPos/500.0 # Normalised personYPos
-	gstate[4] = obstacleXPos/500.0 # Normalised obstacleXPos
-	gstate[5] = obstacleYPos/500.0 # Normalised obstacleYPos
-	gstate[6] = goalXPos/500.0 # Normalised goalXPos
-	gstate[7] = goalYPos/500.0 # Normalised goalYPos
+def CaptureNormalisedState(agentPos, personPos, obstaclePos, goalPos):
+	gstate = [0] * config.STATECOUNT
+	for i in range(config.AGENT_NUM):
+		gstate[i*2] = agentPos[i][0]/500.0
+		gstate[i*2+1] = agentPos[i][1]/500.0
+	for i in range(config.PERSON_NUM):
+		gstate[i*2 + config.AGENT_NUM*2] = personPos[i][0]/500.0
+		gstate[i*2+1 + config.AGENT_NUM*2] = personPos[i][1]/500.0
+	for i in range(config.OBSTACLE_NUM):
+		gstate[i*2 + config.AGENT_NUM*2 + config.PERSON_NUM*2] = obstaclePos[i][0]/500.0
+		gstate[i*2+1 + config.AGENT_NUM*2 + config.PERSON_NUM*2] = obstaclePos[i][0]/500.0
+	gstate[config.AGENT_NUM*2 + config.PERSON_NUM*2 + config.OBSTACLE_NUM*2] = goalPos[0]/500.0
+	gstate[1 + config.AGENT_NUM*2 + config.PERSON_NUM*2 + config.OBSTACLE_NUM*2] = goalPos[1]/500.0
+	
+	gstate = np.array(gstate)
 	
 	return gstate
 # =====================================================================
@@ -36,8 +41,8 @@ def PlayExperiment():
 	# Initialise NextAction  Assume Action is scalar:  0:stay, 1:Up, 2:Down 3:Right 4.Left
 	BestAction = 0
 	
-	# Initialise current Game State ~ Believe insigificant: (agentXPos, agentYPos, personXPos, personYPos)
-	GameState = CaptureNormalisedState(100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0)
+	# Initialise current Game State ~ Believe insigificant: (agentPos, agentPos, personPos, personPos)
+	GameState = [0] * config.STATECOUNT
 	
     # =================================================================
 	#Main Experiment Loop 
@@ -55,8 +60,8 @@ def PlayExperiment():
 			BestAction = TheAgent.Act(GameState, Episode)
 
 			#  Now Apply the Recommended Action into the Game 	
-			[condition, ReturnScore,agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos]= TheGame.PlayNextMove(BestAction)
-			NextState = CaptureNormalisedState(agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos)
+			[condition_agent, condition_person, ReturnScore, agentPos, personPos, obstaclePos, goalPos]= TheGame.PlayNextMove(BestAction)
+			NextState = CaptureNormalisedState(agentPos, personPos, obstaclePos, goalPos)
 
 			# Capture the Sample [S, A, R, S"] in Agent Experience Replay Memory 
 			TheAgent.CaptureSample((GameState,BestAction,ReturnScore,NextState),Episode)
@@ -69,12 +74,13 @@ def PlayExperiment():
 
 			# Move GameTime Click
 			GameTime = GameTime+1
-
-			if condition == "success":
-				Success = Success + 1
-				break
-			if condition == "fail":
-				break
+			for i in range(config.PERSON_NUM):
+				if condition_person[i] == 1:
+					Success = Success + 1
+					break
+			for i in range(config.AGENT_NUM):
+				if condition_agent[i] == -1:
+					break
 		
 		# Move Episode Click
 		Episode = Episode + 1

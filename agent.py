@@ -67,11 +67,13 @@ class Agent:
 	# ============================================
 	# Return the Best Action  from a Q[S,A] search.  Depending upon an Epslion Explore/ Exploitaiton decay ratio 
 	def Act(self, s, Episode):
-		if (random.random() < self.epsilon or Episode < config.OBSERVEPERIOD):
-			return random.randint(0, self.NbrActions-1)						# Explore 
-		else:
-			return numpy.argmax(self.brain.predictOne(s))					# Exploit Brain best Prediction 
-
+		action = list()
+		for i in range(config.AGENT_NUM):
+			if (random.random() < self.epsilon or Episode < config.OBSERVEPERIOD):
+				action.append(random.randint(0, self.NbrActions-1))						# Explore 
+			else :
+				action.append(numpy.argmax(self.brain.predictOne(s)))					# Exploit Brain best Prediction 
+		return action
 	# ============================================
 	def CaptureSample(self, sample, Episode):  # in (s, a, r, s_) format
 		self.ExpReplay.add(sample)        
