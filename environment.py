@@ -227,6 +227,7 @@ class Rescue:
 			self.personPos[i] = updatePerson(self.agentPos, self.obstaclePos, self.obstacleWidth, self.obstacleHeight, self.personPos[i])
 			drawPerson(self.personPos[i])
 		
+#==================================< score >======================================================================================================================================================================================================================================================#		
 		#goal arrived
 		for i in range(config.PERSON_NUM):
 			if abs(self.goalPos[0] + config.GOAL_WIDTH * 0.5 - self.personPos[i][0]) < config.GOAL_WIDTH * 0.5 + config.PERSON_SIZE and abs(self.goalPos[1] + config.GOAL_HEIGHT * 0.5 - self.personPos[i][1]) < config.GOAL_HEIGHT * 0.5 + config.PERSON_SIZE:
@@ -240,13 +241,15 @@ class Rescue:
 					condition_agent[i] = -1
 					score_0.append(-5.0)
 
-		#score based on distance
+		#score based on goal & person
 		for i in range(config.PERSON_NUM):
 			if self.distance(self.personPos[i],self.goalPos) < self.distance_prev_person_goal[i]:
 				score_1.append(5.0)
 			elif self.distance(self.personPos[i],self.goalPos) > self.distance_prev_person_goal[i]:
 				score_1.append(-0.5)
 			self.distance_prev_person_goal.append(self.distance(self.personPos[i],self.goalPos))
+		
+		#score based on agent & person
 		for i in range(config.AGENT_NUM):
 			for j in range(config.PERSON_NUM):
 				if self.distance(self.agentPos[i],self.personPos[j]) < self.distance_prev_agent_person[i][j]:
@@ -255,7 +258,12 @@ class Rescue:
 					score_2.append(-0.01)
 				self.distance_prev_agent_person.append(self.distance(self.agentPos[i],self.personPos[j]))
 				
-		self.score = sum(score_0) + sum(score_1) + sum(score_2)
+		self.score = sum(score_0) + sum(score_2)
+		print("score_0: ", score_0)
+		print("score_1: ", score_1)
+		print("score_2: ", score_2)
+
+#=================================================================================================================================================================================================================================================================================================#
 
 		#  Display Parameters
 		ScoreDisplay = self.font.render("Score: "+ str("{0:.2f}".format(self.score)), True,(255,255,255))

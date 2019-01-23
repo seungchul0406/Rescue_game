@@ -1,5 +1,3 @@
-import random
-
 #Number of agent, person, and obstacle
 AGENT_NUM = 3
 PERSON_NUM = 5
@@ -37,7 +35,7 @@ GOAL_POS = (450,450)
 ACTIONS = 5 # Number of Actions.  Acton istelf is a scalar:  0:stay, 1:Up, 2:Down 3:Right 4.Left
 STATECOUNT = AGENT_NUM * 2 + PERSON_NUM * 2 + OBSTACLE_NUM * 2 + 2 #Size of State [agentXPos, agentYPos, personXPos, personYPos, obstacleXPos, obstacleYPos, goalXPos, goalYPos] 
 MAX_EPISODE = 10000
-MAX_GAMETIME = 100
+MAX_GAMETIME = 2000
 
 #   DQN Algorith Hyper Paramaters 
 ExpReplay_CAPACITY = 2000
