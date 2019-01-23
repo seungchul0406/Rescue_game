@@ -52,6 +52,9 @@ def PlayExperiment():
 		TheGame.Reset()
 
 		for gtime in range(config.MAX_GAMETIME):
+			
+			# Condition reset
+			condition = False
 		
 			# First just Update the Game Display
 			TheGame.UpdateGameDisplay(Episode,TheAgent.epsilon,Success,GameTime)
@@ -77,10 +80,13 @@ def PlayExperiment():
 			for i in range(config.PERSON_NUM):
 				if condition_person[i] == 1:
 					Success = Success + 1
-					break
+					condition = True
 			for i in range(config.AGENT_NUM):
 				if condition_agent[i] == -1:
-					break
+					condition = True
+			
+			if condition is True:
+				break
 		
 		# Move Episode Click
 		Episode = Episode + 1

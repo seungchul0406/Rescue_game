@@ -14,8 +14,8 @@ def drawAgent(agentPos):
 def drawPerson(personPos):
 	pygame.draw.circle(screen, config.BLUE, personPos, config.PERSON_SIZE)
 
-def drawObstacle(obstaclePos):
-	obstacle = pygame.Rect(obstaclePos[0], obstaclePos[1], config.OBSTACLE_WIDTH, config.OBSTACLE_HEIGHT)
+def drawObstacle(obstaclePos, obstacleWidth, obstacleHeight):
+	obstacle = pygame.Rect(obstaclePos[0], obstaclePos[1], obstacleWidth, obstacleHeight)
 	pygame.draw.rect(screen, config.YELLOW, obstacle)
 
 def drawGoal(goalPos):
@@ -55,7 +55,7 @@ def updateAgent(action, agentPos):
 	return agentPos
 # =========================================================================
 #Update the person position, using the agent posistions
-def updatePerson(agentPos, obstaclePos, personPos):
+def updatePerson(agentPos, obstaclePos, obstacleWidth, obstacleHeight, personPos):
 	personXPos = personPos[0]
 	personYPos = personPos[1]
 	
@@ -74,7 +74,7 @@ def updatePerson(agentPos, obstaclePos, personPos):
 
 	# move around obstacle nearby
 	for i in range(config.OBSTACLE_NUM):
-		if abs(obstaclePos[i][0] - personPos[0]) < config.OBSTACLE_WIDTH  - config.PERSON_SIZE and abs(obstaclePos[i][1] - personPos[1]) < config.OBSTACLE_HEIGHT - config.PERSON_SIZE:
+		if abs(obstaclePos[i][0] + obstacleWidth[i] * 0.5 - personPos[0]) < obstacleWidth[i] * 0.5 + config.PERSON_SIZE and abs(obstaclePos[i][1] + obstacleHeight[i] * 0.5 - personPos[1]) < obstacleHeight[i] * 0.5 + config.PERSON_SIZE:
 			if obstaclePos[i][0] > personPos[0]:
 				personXPos = personPos[0] - config.PERSON_SPEED
 			elif obstaclePos[i][0] < personPos[0]:
@@ -86,18 +86,18 @@ def updatePerson(agentPos, obstaclePos, personPos):
 				personYPos = personPos[1] + config.PERSON_SPEED
 
 	# move around whenever there isn't the agent nearby
-	# else:
-	# 	choice = random.randint(1, 5)
-	# 	if choice == 1:
-	# 		personXPos = personPos[0] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
-	# 	elif choice == 2:
-	# 		personYPos = personPos[1] + int(random.randint(1, config.PERSON_SPEED) * 1.0)
-	# 	elif choice == 3:
-	# 		personXPos = personPos[0] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
-	# 	elif choice == 4:
-	# 		personYPos = personPos[1] - int(random.randint(1, config.PERSON_SPEED) * 1.0)
-	# 	elif choice == 5:
-	# 		pass
+	else:
+		choice = random.randint(1, 5)
+		if choice == 1:
+			personXPos = personPos[0] + int(random.randint(1, config.PERSON_RAND_SPEED) * 1.0)
+		elif choice == 2:
+			personYPos = personPos[1] + int(random.randint(1, config.PERSON_RAND_SPEED) * 1.0)
+		elif choice == 3:
+			personXPos = personPos[0] - int(random.randint(1, config.PERSON_RAND_SPEED) * 1.0)
+		elif choice == 4:
+			personYPos = personPos[1] - int(random.randint(1, config.PERSON_RAND_SPEED) * 1.0)
+		elif choice == 5:
+			pass
 	
 	#don't let it move off the screen
 	if (personPos[0] < 0 + config.PERSON_SIZE*4):
@@ -121,12 +121,16 @@ class Rescue:
 		self.agentPos = list()
 		self.personPos = list()
 		self.obstaclePos = list()
+		self.obstacleWidth = list()
+		self.obstacleHeight = list()
 		for i in range(config.AGENT_NUM):
-			self.agentPos.append((random.randint(0, 500), random.randint(0, 500)))
+			self.agentPos.append((random.randint(0, 500 - config.GOAL_WIDTH), random.randint(0 , 500 - config.GOAL_HEIGHT)))
 		for i in range(config.PERSON_NUM):
-			self.personPos.append((random.randint(0, 500), random.randint(0, 500)))
+			self.personPos.append((random.randint(0, 500 - config.GOAL_WIDTH), random.randint(0, 500 - config.GOAL_HEIGHT)))
 		for i in range(config.OBSTACLE_NUM):
-			self.obstaclePos.append((random.randint(0 + config.OBSTACLE_WIDTH * 0.5, 500 - config.OBSTACLE_WIDTH * 0.5), random.randint(0 + config.OBSTACLE_HEIGHT * 0.5, 500 - config.OBSTACLE_HEIGHT * 0.5)))
+			self.obstacleWidth.append(random.randint(config.OBSTACLE_MIN_WIDTH, config.OBSTACLE_MAX_WIDTH))
+			self.obstacleHeight.append(random.randint(config.OBSTACLE_MIN_HEIGHT, config.OBSTACLE_MAX_HEIGHT))
+			self.obstaclePos.append((random.randint(0, 500 - self.obstacleWidth[i] - config.GOAL_WIDTH), random.randint(0, 500 - self.obstacleHeight[i] - config.GOAL_HEIGHT)))
 		self.goalPos = config.GOAL_POS
 
 		self.clock = pygame.time.Clock()
@@ -149,7 +153,7 @@ class Rescue:
 		for i in range(config.PERSON_NUM):
 			drawPerson(self.personPos[i])
 		for i in range(config.OBSTACLE_NUM):
-			drawObstacle(self.obstaclePos[i])
+			drawObstacle(self.obstaclePos[i], self.obstacleWidth[i], self.obstacleHeight[i])
 		drawGoal(self.goalPos)
 		#updates the window
 		pygame.display.flip()
@@ -166,12 +170,16 @@ class Rescue:
 		self.agentPos = list()
 		self.personPos = list()
 		self.obstaclePos = list()
+		self.obstacleWidth = list()
+		self.obstacleHeight = list()
 		for i in range(config.AGENT_NUM):
-			self.agentPos.append((random.randint(0, 500), random.randint(0, 500)))
+			self.agentPos.append((random.randint(0, 500 - config.GOAL_WIDTH), random.randint(0 , 500 - config.GOAL_HEIGHT)))
 		for i in range(config.PERSON_NUM):
-			self.personPos.append((random.randint(0, 500), random.randint(0, 500)))
+			self.personPos.append((random.randint(0, 500 - config.GOAL_WIDTH), random.randint(0, 500 - config.GOAL_HEIGHT)))
 		for i in range(config.OBSTACLE_NUM):
-			self.obstaclePos.append((random.randint(0 + config.OBSTACLE_WIDTH * 0.5, 500 - config.OBSTACLE_WIDTH * 0.5), random.randint(0 + config.OBSTACLE_HEIGHT * 0.5, 500 - config.OBSTACLE_HEIGHT * 0.5)))
+			self.obstacleWidth.append(random.randint(config.OBSTACLE_MIN_WIDTH, config.OBSTACLE_MAX_WIDTH))
+			self.obstacleHeight.append(random.randint(config.OBSTACLE_MIN_HEIGHT, config.OBSTACLE_MAX_HEIGHT))
+			self.obstaclePos.append((random.randint(0, 500 - self.obstacleWidth[i] - config.GOAL_WIDTH), random.randint(0, 500 - self.obstacleHeight[i] - config.GOAL_HEIGHT)))
 
 		#distance define
 		for i in range(config.AGENT_NUM):
@@ -182,7 +190,7 @@ class Rescue:
 			drawPerson(self.personPos[i])
 			self.distance_prev_person_goal.append(self.distance(self.personPos[i],self.goalPos))
 		for i in range(config.OBSTACLE_NUM):
-			drawObstacle(self.obstaclePos[i])
+			drawObstacle(self.obstaclePos[i], self.obstacleWidth[i], self.obstacleHeight[i])
 
 		#updates the window
 		pygame.display.flip()
@@ -206,7 +214,7 @@ class Rescue:
 
 		#draw goal & obstacle
 		for i in range(config.OBSTACLE_NUM):
-			drawObstacle(self.obstaclePos[i])
+			drawObstacle(self.obstaclePos[i], self.obstacleWidth[i], self.obstacleHeight[i])
 		drawGoal(self.goalPos)
 
 		#update agent
@@ -216,19 +224,19 @@ class Rescue:
 		
 		#update person
 		for i in range(config.PERSON_NUM):
-			self.personPos[i] = updatePerson(self.agentPos, self.obstaclePos, self.personPos[i])
+			self.personPos[i] = updatePerson(self.agentPos, self.obstaclePos, self.obstacleWidth, self.obstacleHeight, self.personPos[i])
 			drawPerson(self.personPos[i])
 		
 		#goal arrived
 		for i in range(config.PERSON_NUM):
-			if abs(self.goalPos[0] - self.personPos[i][0]) < config.GOAL_WIDTH * 0.5 and abs(self.goalPos[1] - self.personPos[i][1]) < config.GOAL_HEIGHT * 0.5:
+			if abs(self.goalPos[0] + config.GOAL_WIDTH * 0.5 - self.personPos[i][0]) < config.GOAL_WIDTH * 0.5 + config.PERSON_SIZE and abs(self.goalPos[1] + config.GOAL_HEIGHT * 0.5 - self.personPos[i][1]) < config.GOAL_HEIGHT * 0.5 + config.PERSON_SIZE:
 				condition_person[i] = 1
 				score_0.append(10.0)
 		
 		#obstacle collision
 		for i in range(config.AGENT_NUM):
 			for j in range(config.OBSTACLE_NUM):	
-				if abs(self.obstaclePos[j][0] - self.agentPos[i][0]) < config.OBSTACLE_WIDTH * 0.5 - config.AGENT_SIZE and abs(self.obstaclePos[j][1] - self.agentPos[i][1]) < config.OBSTACLE_HEIGHT * 0.5 - config.AGENT_SIZE:
+				if abs(self.obstaclePos[j][0] + self.obstacleWidth[j] * 0.5 - self.agentPos[i][0]) < self.obstacleWidth[j] * 0.5 + config.AGENT_SIZE and abs(self.obstaclePos[j][1] + self.obstacleHeight[j] * 0.5 - self.agentPos[i][1]) < self.obstacleHeight[j] * 0.5 + config.AGENT_SIZE:
 					condition_agent[i] = -1
 					score_0.append(-5.0)
 
